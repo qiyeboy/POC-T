@@ -1,7 +1,7 @@
-# !/usr/bin/env python
-#  -*- coding: utf-8 -*-
-__author__ = 'xy'
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# author = i@cdxy.me
+# project = https://github.com/Xyntax/POC-T
 
 class ToolkitBaseException(Exception):
     pass
@@ -24,4 +24,24 @@ class ToolkitSystemException(ToolkitBaseException):
 
 
 class ToolkitValueException(ToolkitBaseException):
+    pass
+
+
+class ToolkitPluginException(ToolkitBaseException):
+    pass
+
+
+class RegisterException(Exception):
+    pass
+
+
+class RegisterValueException(RegisterException):
+    pass
+
+
+class RegisterDataException(RegisterException):
+    pass
+
+
+class RegisterMutexException(RegisterException):
     pass

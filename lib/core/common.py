@@ -1,6 +1,7 @@
-# !/usr/bin/env python
-#  -*- coding: utf-8 -*-
-__author__ = 'xy'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# author = i@cdxy.me
+# project = https://github.com/Xyntax/POC-T
 
 import os
 import re
@@ -13,7 +14,7 @@ from lib.core.exception import *
 from lib.core.log import CUSTOM_LOGGING, LOGGER_HANDLER
 from lib.core.settings import BANNER, UNICODE_ENCODING, NULL, INVALID_UNICODE_CHAR_FORMAT
 from lib.core.convert import stdoutencode
-from lib.core.enums import EXIT_STATUS
+from lib.core.enums import EXIT_STATUS, ENGINE_MODE_STATUS
 from thirdparty.termcolor.termcolor import colored
 from thirdparty.odict.odict import OrderedDict
 
@@ -24,10 +25,10 @@ def setPaths():
     """
     ROOT_PATH = paths.ROOT_PATH
     paths.DATA_PATH = os.path.join(ROOT_PATH, "data")
-    paths.MODULES_PATH = os.path.join(ROOT_PATH, "module")
+    paths.SCRIPT_PATH = os.path.join(ROOT_PATH, "script")
     paths.OUTPUT_PATH = os.path.join(ROOT_PATH, "output")
-    if not os.path.exists(paths.MODULES_PATH):
-        os.mkdir(paths.MODULES_PATH)
+    if not os.path.exists(paths.SCRIPT_PATH):
+        os.mkdir(paths.SCRIPT_PATH)
     if not os.path.exists(paths.OUTPUT_PATH):
         os.mkdir(paths.OUTPUT_PATH)
     if not os.path.exists(paths.DATA_PATH):
@@ -59,7 +60,7 @@ def checkFile(filename):
         try:
             with open(filename, "rb"):
                 pass
-        except:
+        except IOError:
             valid = False
 
     if not valid:
@@ -93,7 +94,7 @@ def dataToStdout(data, bold=False):
     Writes text to the stdout (console) stream
     """
     if conf.SCREEN_OUTPUT:
-        if conf.ENGINE is 't':
+        if conf.ENGINE is ENGINE_MODE_STATUS.THREAD:
             logging._acquireLock()
 
         if isinstance(data, unicode):
@@ -108,7 +109,7 @@ def dataToStdout(data, bold=False):
         except IOError:
             pass
 
-        if conf.ENGINE is 't':
+        if conf.ENGINE is ENGINE_MODE_STATUS.THREAD:
             logging._releaseLock()
     return
 
@@ -196,7 +197,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
             except UnicodeDecodeError, ex:
                 try:
                     return unicode(value, UNICODE_ENCODING)
-                except:
+                except Exception:
                     value = value[:ex.start] + "".join(
                         INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
     else:
@@ -282,9 +283,10 @@ def openBrowser():
     path = conf.OUTPUT_FILE_PATH
     try:
         webbrowser.open_new_tab(path)
-    except Exception, e:
+    except Exception:
         errMsg = '\n[ERROR] Fail to open file with web browser: %s' % path
         raise ToolkitSystemException(errMsg)
+
 
 def checkSystemEncoding():
     """
